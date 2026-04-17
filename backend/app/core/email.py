@@ -62,6 +62,13 @@ def send_verification_email(*, to_email: str, token: str) -> None:
     Mailtrap 等の SMTP を想定した最小実装。
     送信に失敗しても登録処理自体は継続できるよう、例外は飲み込みます。
     """
+    verify_url = f"{settings.FRONTEND_BASE_URL}/verify-email?token={token}"
+    subject, text, html = build_verification_email(verify_url=verify_url)
+    print(f"[mail] verify_url={verify_url}")
+
+    if settings.MAIL_DELIVERY == "log":
+        print("[mail] delivery=log (SMTP送信しません)")
+        return
     if settings.MAIL_SKIP_SEND:
         print("[mail] skipped: MAIL_SKIP_SEND=1")
         return
@@ -77,10 +84,6 @@ def send_verification_email(*, to_email: str, token: str) -> None:
     ):
         print("[mail] skipped: SMTP settings missing")
         return
-
-    verify_url = f"{settings.FRONTEND_BASE_URL}/verify-email?token={token}"
-    subject, text, html = build_verification_email(verify_url=verify_url)
-    print(f"[mail] verify_url={verify_url}")
 
     msg = EmailMessage()
     if settings.MAIL_FROM_NAME:

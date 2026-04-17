@@ -32,6 +32,8 @@ class Settings:
     MAIL_FROM_ADDRESS: str | None = os.getenv("MAIL_FROM_ADDRESS")
     MAIL_FROM_NAME: str = os.getenv("MAIL_FROM_NAME", "")
     MAIL_SKIP_SEND: bool = os.getenv("MAIL_SKIP_SEND", "0") == "1"
+    # メール配信モード: "log"（送らずリンクをログに出す） / "smtp"（SMTP送信）
+    MAIL_DELIVERY: str = os.getenv("MAIL_DELIVERY", "smtp")
 
 
 settings = Settings()
