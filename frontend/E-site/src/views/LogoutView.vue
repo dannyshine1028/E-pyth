@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 onMounted(() => {
-  // TODO: トークン削除・ストアのクリアなど
+  localStorage.removeItem('accessToken')
   router.replace({ name: 'home' })
 })
 </script>

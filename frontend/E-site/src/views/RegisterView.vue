@@ -26,8 +26,8 @@ const submit = async () => {
       return
     }
 
-    // 登録できたのでログインへ遷移（トークン管理は未実装のため簡易でOK）
-    window.location.href = '/login'
+    // 登録後は本人確認が必要なので、メールリンクから認証してからログインする
+    window.location.href = '/verify-email'
   } catch (e) {
     errorMessage.value = e?.message || '通信に失敗しました'
   } finally {

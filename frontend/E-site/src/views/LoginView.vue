@@ -22,22 +22,22 @@ const submit = async () => {
 
     const payload = await res.json().catch(() => ({}))
     if (!res.ok) {
-      errorMessage.value = payload?.detail || 'ログインに失敗しました'
+      if (res.status === 403 && payload?.detail === 'email not verified') {
+        errorMessage.value =
+          'メール認証が完了していません。届いたメールのリンクを開いてください。'
+      } else {
+        errorMessage.value = payload?.detail || 'ログインに失敗しました'
+      }
       return
     }
 
-    if (payload?.next === 'verify-email') {
-      const t = payload?.flowToken
-      window.location.href = t
-        ? `/verify-email?token=${encodeURIComponent(String(t))}`
-        : '/verify-email'
+    const accessToken = payload?.accessToken
+    if (!accessToken) {
+      errorMessage.value = 'ログイン応答が不正です'
       return
     }
 
-    if (payload?.next === 'profile') {
-      window.location.href = `/profile?token=${encodeURIComponent(payload.flowToken || '')}`
-      return
-    }
+    localStorage.setItem('accessToken', String(accessToken))
 
     window.location.href = '/dashboard'
   } catch (e) {
