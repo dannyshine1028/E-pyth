@@ -1,22 +1,69 @@
 <script setup>
 import { RouterLink } from 'vue-router'
+import { ref } from 'vue'
+
+const email = ref('')
+const password = ref('')
+const errorMessage = ref('')
+const isSubmitting = ref(false)
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
+
+const submit = async () => {
+  errorMessage.value = ''
+  isSubmitting.value = true
+  try {
+    const res = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: email.value, password: password.value }),
+    })
+
+    const payload = await res.json().catch(() => ({}))
+    if (!res.ok) {
+      errorMessage.value = payload?.detail || '登録に失敗しました'
+      return
+    }
+
+    // 登録できたのでログインへ遷移（トークン管理は未実装のため簡易でOK）
+    window.location.href = '/login'
+  } catch (e) {
+    errorMessage.value = e?.message || '通信に失敗しました'
+  } finally {
+    isSubmitting.value = false
+  }
+}
 </script>
 
 <template>
   <div class="page">
     <h1>新規登録</h1>
     <p class="lead">アカウントを作成します。</p>
-    <form class="form" @submit.prevent>
+    <form class="form" @submit.prevent="submit">
       <label>
         メール
-        <input type="email" name="email" autocomplete="username" />
+        <input
+          v-model="email"
+          type="email"
+          name="email"
+          autocomplete="username"
+        />
       </label>
       <label>
         パスワード
-        <input type="password" name="password" autocomplete="new-password" />
+        <input
+          v-model="password"
+          type="password"
+          name="password"
+          autocomplete="new-password"
+        />
       </label>
-      <button type="submit">登録</button>
+      <button type="submit" :disabled="isSubmitting">
+        {{ isSubmitting ? '登録中...' : '登録' }}
+      </button>
     </form>
+    <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
     <p class="links">
       すでにアカウントがある方は
       <RouterLink to="/login">ログイン</RouterLink>
@@ -68,5 +115,11 @@ import { RouterLink } from 'vue-router'
 }
 .links a {
   color: var(--color-heading);
+}
+
+.error {
+  margin-top: 1rem;
+  color: #b00020;
+  font-size: 0.9rem;
 }
 </style>

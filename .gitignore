@@ -1,5 +1,7 @@
 /frontend/E-site/node_modules
 /backend/venv/
+/backend/.env
+/backend/.env.*
 
 package-lock.json
 composer.lock
