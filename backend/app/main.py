@@ -30,5 +30,11 @@ def root():
     return {"message": "Backend OK"}
 
 
-# 起動時にテーブルを作成
-Base.metadata.create_all(bind=engine)
+@app.on_event("startup")
+def on_startup():
+    # DBが落ちていてもbackend自体は起動できるようにする（開発継続性優先）
+    try:
+        Base.metadata.create_all(bind=engine)
+        print("[db] create_all ok")
+    except Exception as e:
+        print(f"[db] create_all failed: {type(e).__name__}: {e}")
